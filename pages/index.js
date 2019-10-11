@@ -1,15 +1,46 @@
 export default {
-    data(){
+    data() {
         return {
             // 轮播图数据
             banners: [
+            ],
+            options: [      // 搜索框tab选项
                 {
-                    url: "http://157.122.54.189:9095/assets/images/th03.jfif",
+                    name: "攻略",
+                    placeholder: "搜索城市",
+                    pageUrl: "/post?city="
                 },
                 {
-                    url: "http://157.122.54.189:9095/assets/images/th04.jfif",
+                    name: "酒店",
+                    placeholder: "请输入城市搜索酒店",
+                    pageUrl: "/hotel?city="
+                },
+                {
+                    name: "机票",
+                    placeholder: "请输入出发地",
+                    pageUrl: "/air"
                 }
-            ]
+            ],
+            searchValue: "",    // 搜索框的值
+            currentOption: 0,   // 当前选中的选项        
         }
-    }
+    },
+
+    mounted() {
+        this.$axios({
+            url: '/scenics/banners'
+        }).then(res => {
+            const { data } = res.data;
+            this.banners = data;
+        })
+    },
+    methods: {
+        handleOption(index){
+            this.currentOption=index;
+            if(index===2){
+                this.$router.push(this.options[index].pageUrl)
+            }
+        },
+        handleSearch(){}
+    },
 }
