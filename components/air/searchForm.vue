@@ -88,9 +88,10 @@ export default {
     },
 
     handleSelectCity(type) {
+      
       if (this.Cities.length === 0) return false;
         this.form[type + "City"] = this.Cities[0].value;
-        this.form[type + "Code"] = this.Cities[0].sort;
+        this.form[type + "Code"] = this.Cities[0].sort;     
 
     },
     // 出发城市输入框获得焦点时触发
