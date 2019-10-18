@@ -122,6 +122,7 @@ export default {
     handleDeleteUser(index) {
       this.users.splice(index, 1);
     },
+    // 购买或移除保险
     handleChange(id) {
       const index = this.insurances.indexOf(id);
 
@@ -170,15 +171,18 @@ export default {
         seat_xid: this.$route.query.seat_xid,
         air: this.$route.query.id
       };
-      if (
-        data.users.length === 0 ||
-        !data.contactName ||
-        !data.contactPhone ||
-        !data.captcha
-      ) {
-        this.$message.success("请检查订单信息是否填完整");
-        return;
-      }
+      // 判断证件号码
+      const result= this.users.map(v=>{
+        if(!v.id){
+          this.$message.error("证件号码不能为空");
+          return 'false';
+        }else{
+          return 'true';
+        }
+      })
+      if(result.indexOf('false')>-1)return;
+        
+      
       const res = await this.$axios({
         url: "/airorders",
         headers: {
