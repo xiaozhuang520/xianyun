@@ -173,8 +173,8 @@ export default {
       };
       // 判断证件号码
       const result= this.users.map(v=>{
-        if(!v.id){
-          this.$message.error("证件号码不能为空");
+        if(!/(^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$)/.test(v.id)){
+          this.$message.error("证件号码格式不正确");
           return 'false';
         }else{
           return 'true';
