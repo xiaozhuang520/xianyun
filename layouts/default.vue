@@ -10,6 +10,7 @@
 <script>
 import Header from '@/components/header'
 import Footer from '@/components/footer'
+
 export default {
  // 注册组件
   components: {
@@ -20,6 +21,7 @@ export default {
 </script>
 
 <style lang="less">
+@import url('http://at.alicdn.com/t/font_1448405_abeceea7xfc.css');
 html {
   font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     Roboto, 'Helvetica Neue', Arial, sans-serif;
