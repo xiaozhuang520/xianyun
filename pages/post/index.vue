@@ -152,7 +152,8 @@ export default {
       this.getPostCity(`&city=${city}`);
     },
     handleSizeChange(val) {
-      // console.log(`每页 ${val} 条`);
+      this.pageSize=val;
+      this.getPostCity()
     },
     handleCurrentChange(val) {
       if (val === 1) {
@@ -160,7 +161,7 @@ export default {
       } else if (val === 2) {
         this.start = 3;
       } else {
-        this.start = val - 1 * 3;
+        this.start = (val-1) * 3;
       }
       this.getPostCity();
     },
