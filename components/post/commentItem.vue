@@ -1,6 +1,7 @@
 <template>
   <div class="conment_item">
-    <el-row type="flex" justify="space-between">
+    <router-link :to="`/post/detail?id=${data.id}`" >
+      <el-row type="flex" justify="space-between">
       <div class="left_img">
         <img :src="data.images[0]" alt />
       </div>
@@ -10,10 +11,11 @@
         </div>
         <div class="time_read">
           <span>2019-10-20 4:22</span>
-          <i>阅读 {{data.watch===null?0:data.watch}}</i>
+          <i>阅读: {{data.watch===null?0:data.watch}}</i>
         </div>
       </div>
     </el-row>
+    </router-link>
   </div>
 </template>
 
@@ -24,7 +26,12 @@ export default {
             type:Object,
             default:{}
         }
-    }
+    },
+    watch:{
+      $route(){
+        this.$emit('handledetail')
+      }
+    },
 };
 </script>
 

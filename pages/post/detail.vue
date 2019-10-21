@@ -9,15 +9,15 @@
         <h2>{{detail.title}}</h2>
         <div class="detail_strategy">
           <span>攻略: {{detail.city.created_at}}</span>
-          <i>阅读：{{detail.watch}}</i>
+          <i>阅读：{{detail.watch===null?0:detail.watch}}</i>
         </div>
         <div class="content" v-html="detail.content"></div>
         <el-row class="operation" type="flex" justify="center">
           <div class="comment">
             <i class="iconfont iconpinglun"></i>
-            <p>评论(100)</p>
+            <p>评论({{total}})</p>
           </div>
-          <div class="collect">
+          <div class="collect" @click="handleCollect">
             <i class="iconfont iconklmshoucang"></i>
             <p>收藏</p>
           </div>
@@ -25,47 +25,82 @@
             <i class="iconfont iconfenxiang-1"></i>
             <p>分享</p>
           </div>
-          <div class="like">
+          <div class="like" @click="handleLike">
             <i class="iconfont iconlike"></i>
-            <p>点赞(100)</p>
+            <p>点赞({{detail.like===null?0:detail.like}})</p>
           </div>
         </el-row>
-        <!-- 分页 -->
-        <el-row type="flex" justify="center">
-          <el-pagination
-            class="paging"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="pageIndex"
-            :page-sizes="[3, 5, 10, 15]"
-            :page-size="100"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="total"
-          ></el-pagination>
-        </el-row>
+
         <div class="comment">
           <h3>评论</h3>
-          <textarea name id rows="3" style="Width:100%;" placeholder="说点什么吧..."></textarea>
+          <div class="box" v-show="isShow">
+            <div class="reply" ref="reply">你发的能放得开</div>
+            <i @click="handleDelete">×</i>
+          </div>
+          <textarea name id rows="3" placeholder="说点什么吧..." v-model="form.content"></textarea>
           <el-row class="addimg_submint" type="flex" justify="space-between">
             <el-upload
               :action="`${$axios.defaults.baseURL}/upload/`"
               list-type="picture-card"
-              :on-preview="handlePictureCardPreview"
               :on-remove="handleRemove"
               name="files"
+              :on-success="handleAvatarSuccess"
+              :on-preview="handlePictureCardPreview"
             >
               <i class="el-icon-plus"></i>
             </el-upload>
             <el-dialog :visible.sync="dialogVisible">
               <img width="100%" :src="dialogImageUrl" alt />
             </el-dialog>
-            <span>提交</span>
+            <span @click="handleSubmit">提交</span>
           </el-row>
+          <!-- 评论列表 -->
+          <div class="comment_list" v-for="(item,index) in postComments" :key="index">
+            <el-row class="user" type="flex" justify="space-between">
+              <div class="user_info">
+                <img :src="$axios.defaults.baseURL+item.account.defaultAvatar" alt />
+                <span>{{item.account.nickname}}</span>
+                <i>2019-10-19</i>
+              </div>
+              <em>{{index+1}}</em>
+            </el-row>
+            <div class="content">
+              <Item :data="item.parent" v-if="item.parent"  @handlehuifu="handleHuiFu"/>
+              <div class="mian">
+                <p>{{item.content}}</p>
+                <el-row type="flex" justify="start">
+                  <div class="content_img" v-for="(data,index) in item.pics" v-if="item.pics">
+                    <img :src="$axios.defaults.baseURL+data.url" alt />
+                  </div>
+                </el-row>
+                <span @click="handleReply(item)">回复</span>
+              </div>
+            </div>
+          </div>
+          <!-- 分页 -->
+          <el-row type="flex" justify="center" v-if="postComments.length !==0">
+            <el-pagination
+              class="paging"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="pageIndex"
+              :page-sizes="[2, 5, 10, 15]"
+              :page-size="100"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="total"
+            ></el-pagination>
+          </el-row>
+          <div class="reminder" v-if="postComments.length===0">暂无评论！</div>
         </div>
       </div>
       <div class="right">
         <h4>相关攻略</h4>
-        <CommentItem v-for="(item,index) in recommend" :key="index" :data="item" />
+        <CommentItem
+          v-for="(item,index) in recommend"
+          :key="index"
+          :data="item"
+          @handledetail="handleDetail"
+        />
       </div>
     </el-row>
   </div>
@@ -73,65 +108,200 @@
 
 <script>
 import CommentItem from "@/components/post/commentItem";
+import Item from "@/components/post/Item";
 export default {
   data() {
     return {
-         dialogImageUrl: '',
-        dialogVisible: false,
+      dialogImageUrl: "",
+      dialogVisible: false,
       // 文章详情
       detail: {
         city: {}
       },
-      //   推荐文章列表
+      // 推荐文章列表
       recommend: [],
-      pageSize: 2,
+      //文章评论列表
+      postComments: [],
+      // 文章总数量
+      total: 0,
       pageIndex: 1,
-      total: 0
+      pageSize: 2,
+      start: 0,
+      //评论数据
+      form: {
+        content: "",
+        pics: []
+      },
+      isShow: false,
+      replyData: ""
     };
   },
   methods: {
+    //点击子项回复按钮
+    handleHuiFu(item){
+      this.isShow = true;
+      this.$refs.reply.innerHTML = `回复 @${item.account.nickname}`;
+      this.replyData=item;
+    },
+    //提交评论
+    addComment() {
+      this.form.post = this.$route.query.id;
+      if (this.replyData) {
+        this.form.follow = this.replyData.id;
+      }
+      this.$axios({
+        url: "/comments",
+        headers: {
+          "Content-Type": `application/json`,
+          Authorization: `Bearer ${this.$store.state.user.userinfo.token}`
+        },
+        method: "post",
+        data: this.form
+      }).then(res => {
+        const { message } = res.data;
+        this.$message.success(message);
+        this.form.content = "";
+        this.isShow = false;
+        this.start=0;
+        this.getpostComments();
+      });
+    },
+    //移除回复按钮
+    handleDelete() {
+      this.isShow = false;
+      this.replyData='';
+    },
+    //点击回复按钮
+    handleReply(data) {
+      this.isShow = true;
+      this.$refs.reply.innerHTML = `回复 @${data.account.nickname}`;
+      this.replyData=data;
+    },
+    //发表评论
+    handleSubmit() {
+      if(!this.form.content){
+        this.$message.error('请输入评论内容');
+        return;
+      }
+      this.addComment();
+     
+    },
+    //点赞
+    handleLike() {
+      this.$axios({
+        url: "/posts/like",
+        params: {
+          id: this.$route.query.id
+        },
+        headers: {
+          Authorization: `Bearer ${this.$store.state.user.userinfo.token}`
+        }
+      }).then(res => {
+        const { message } = res.data;
+        this.$message.success(message);
+        this.getDetail();
+      });
+    },
+    // 收藏
+    handleCollect() {
+      this.$axios({
+        url: "/posts/star",
+        params: {
+          id: this.$route.query.id
+        },
+        headers: {
+          Authorization: `Bearer ${this.$store.state.user.userinfo.token}`
+        }
+      }).then(res => {
+        const { message } = res.data;
+        this.$message.success(message);
+      });
+    },
+    // 切换评论条数
     handleSizeChange(val) {
-      //   this.pageSize = val;
-      //   this.getPostCity();
+      this.pageSize = val;
+      this.getpostComments();
     },
+    // 切换评论到第几条
     handleCurrentChange(val) {
-      //   if (val === 1) {
-      //     this.start = 0;
-      //   } else if (val === 2) {
-      //     this.start = 3;
-      //   } else {
-      //     this.start = (val - 1) * 3;
-      //   }
-      //   this.getPostCity();
+      if (val === 1) {
+        this.start = 0;
+      } else if (val === 2) {
+        this.start = 3;
+      } else {
+        this.start = (val - 1) * 3;
+      }
+      this.getpostComments();
     },
+    // 删除图片
     handleRemove(file, fileList) {
-      console.log(file, fileList);
+      const id = file.response[0].id;
+      const { pics } = this.form;
+      const arr = [];
+      pics.forEach(e => {
+        if (e.id !== id) {
+          arr.push(e);
+        }
+      });
+      this.form.pics = arr;
+    },
+    // 上传图片成功
+    handleAvatarSuccess(res, file) {
+      this.form.pics.push(res[0]);
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
+    },
+    // 文章详情
+    getDetail() {
+      this.$axios({
+        url: "/posts",
+        params: {
+          id: this.$route.query.id
+        }
+      }).then(res => {
+        const { data } = res.data;
+        this.detail = data[0];
+      });
+    },
+    // 点击右侧文章加载文章详情
+    handleDetail() {
+      this.getpostComments();
+      this.getDetail();
+    },
+    // 获取文章评论
+    getpostComments() {
+      this.$axios({
+        url: `/posts/comments`,
+        params: {
+          post: this.$route.query.id,
+          _limit: this.pageSize,
+          _start: this.start
+        }
+      }).then(res => {
+        const { data, total } = res.data;
+        this.postComments = data;
+        this.total = total;
+      });
     }
   },
   mounted() {
-    this.$axios({
-      url: "/posts",
-      params: {
-        id: this.$route.query.id
-      }
-    }).then(res => {
-      const { data } = res.data;
-      this.detail = data[0];
-      console.log(this.detail);
-    });
+    // 获取文章详情
+    this.getDetail();
+    // 获取相关攻略列表
     this.$axios({
       url: "/posts/recommend"
     }).then(res => {
       const { data } = res.data;
       this.recommend = data;
     });
+    // 获取文章评论数据
+    this.getpostComments();
   },
   components: {
-    CommentItem
+    CommentItem,
+    Item
   }
 };
 </script>
@@ -144,6 +314,13 @@ export default {
   margin-top: 20px;
   .left {
     width: 700px;
+    .reminder{
+      width: 100%;
+      height: 50px;
+      line-height: 50px;
+      text-align: center;
+      font-size: 25px;
+    }
     h2 {
       padding: 20px 0;
       border-bottom: 1px solid #dddddd;
@@ -171,7 +348,7 @@ export default {
         text-align: center;
       }
       i {
-        font-size: 40px;
+        font-size: 35px;
         color: #ffa500;
       }
       p {
@@ -185,25 +362,118 @@ export default {
         margin-bottom: 20px;
         font-weight: normal;
       }
+      .box {
+        position: relative;
+        width: 130px;
+        margin-bottom: 10px;
+        padding: 10px;
+        height: 10px;
+        line-height: 10px;
+        font-size: 12px;
+        color: #909399;
+        background: #f4f4f5;
+        border: 1px solid #e0e0e3;
+        border-radius: 5px;
+
+        i {
+          position: absolute;
+          right: 5px;
+          bottom: 8px;
+          width: 15px;
+          height: 15px;
+          font-size: 18px;
+          &:hover {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            text-align: center;
+            background: #909399;
+            color: #fff;
+            cursor: pointer;
+          }
+        }
+      }
       textarea {
+        width: 670px;
         padding: 10px 15px;
         border-radius: 5px;
         border: 1px solid #c0c4cc;
-        color: #c0c4cc;
       }
       .addimg_submint {
         margin-top: 10px;
         span {
           display: inline-block;
           width: 50px;
-          height: 20px;
-          line-height: 20px;
+          height: 30px;
+          line-height: 30px;
           background: #409eff;
           color: #fff;
           border-radius: 5px;
           text-align: center;
           font-size: 12px;
           cursor: pointer;
+        }
+      }
+    }
+    .comment_list {
+      margin-top: 10px;
+      padding: 20px;
+      border: 1px solid #dddddd;
+      border-bottom: 1px dashed #dddddd;
+      .user {
+        margin-bottom: 10px;
+        font-size: 13px;
+        img {
+          display: inline-block;
+          width: 15px;
+          height: 15px;
+          border-radius: 50%;
+          vertical-align: middle;
+        }
+        span {
+          color: #666666;
+        }
+        i {
+          color: #999;
+        }
+      }
+
+      .content {
+        position: relative;
+        padding: 0 20px;
+        p {
+          margin-top: 10px;
+          margin-bottom: 10px;
+        }
+        .content_img {
+          padding: 5px;
+          width: 80px;
+          height: 80px;
+          border: 1px dashed #dddddd;
+          border-radius: 5px;
+          img {
+            width: 100%;
+            height: 100%;
+          }
+        }
+        .mian {
+          &:hover span {
+            display: block;
+            color: #ffa500;
+            cursor: pointer;
+          }
+          span {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            font-size: 14px;
+            display: none;
+            &:hover {
+              display: block;
+              color: #ffa500;
+              cursor: pointer;
+            }
+          }
         }
       }
     }
@@ -225,8 +495,8 @@ export default {
   line-height: 100px;
 }
 
-/deep/ .el-upload-list--picture-card .el-upload-list__item{
-    width: 100px;
-    height: 100px;
+/deep/ .el-upload-list--picture-card .el-upload-list__item {
+  width: 100px;
+  height: 100px;
 }
 </style>

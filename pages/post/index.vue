@@ -5,7 +5,7 @@
       <div class="left">
         <div class="nav" @mouseleave="handleLeave">
           <ul>
-            <li v-for="(item,index) in cities" :key="index" @mouseenter="enter(item)">
+            <li v-for="(item,index) in cities" :key="index" @mouseenter="enter(item,index)" @mouseleave="leave(index)" ref="li">
               {{item.type}}
               <span class="iconfont iconjiantou"></span>
             </li>
@@ -84,6 +84,7 @@ export default {
       postList: [],
       // 城市
       city: "",
+      index:0,
       // 推荐城市
       recommendCity: [
         {
@@ -135,14 +136,21 @@ export default {
       }
     },
     // 导航菜单显示与隐藏
-    enter(item) {
+    enter(item,index) {
+      this.$refs.li[index].className="active";
       this.cityData = item.children;
       this.status = true;
     },
-    handleEnter() {
+    leave(index){
+      this.$refs.li[index].className="";
+      this.index=index;
+    },
+    handleEnter(index) {
+      this.$refs.li[this.index].className="active";
       this.status = true;
     },
     handleLeave() {
+      this.$refs.li[this.index].className="";
       this.status = false;
     },
     // 点击导航右侧切换城市
@@ -241,10 +249,10 @@ export default {
           &:last-child {
             border-bottom: none;
           }
-          &:hover {
-            border-right: 1px solid #fff;
-            color: #ffa500;
-          }
+          // &:hover {
+          //   border-right: 1px solid #fff;
+          //   color: #ffa500;
+          // }
         }
       }
     }
@@ -325,5 +333,9 @@ export default {
       margin-bottom: 20px;
     }
   }
+}
+.active{
+  border-right:1px solid #fff;
+  color: #ffa500;
 }
 </style>

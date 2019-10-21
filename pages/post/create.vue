@@ -4,7 +4,7 @@
       <div class="left">
         <h2>发表新攻略</h2>
         <p>分享你的个人游记，让更多人看到哦！</p>
-        <el-input placeholder="请输入内容" v-model="form.title"></el-input>
+        <el-input placeholder="请输入标题" v-model="form.title"></el-input>
         <div id="app">
           <VueEditor :config="config" ref="vueEditor" class="editor" />
         </div>
@@ -12,7 +12,7 @@
           <span>选择城市：</span>
           <el-autocomplete
             :fetch-suggestions="queryDepartSearch"
-            placeholder="请搜索出发城市"
+            placeholder="请搜索游玩城市"
             @select="handleDepartSelect"
             class="el-autocomplete"
             v-model="form.city"
@@ -55,31 +55,35 @@ export default {
       quill.clipboard.dangerouslyPasteHTML(0, `${data.content}`);
     },
     //保存到草稿
-    handleSave() {},
-    // 发布攻略
-    handlePost() {
+    handleSave() {
+      var postTime = new Date();
+      var newPostTime = moment(postTime).format("YYYY-MM-DD HH:mm:ss");
+      this.form.postTime = newPostTime;
       var quill = this.$refs.vueEditor.editor;
       this.form.content = quill.root.innerHTML;
-
-      if (!this.form) return;
-      this.$axios({
-        url: "/posts",
-        headers: {
-          Authorization: `Bearer ${this.$store.state.user.userinfo.token}`
-        },
-        method: "post",
-        data: this.form
-      }).then(res => {
-        const { message } = res.data;
-        this.$message.success(message);
-        if (message === "新增成功") {
-          var postTime = new Date();
-          this.form.postTime = postTime;
-          this.$store.commit("postdraft/setpostDraft", this.form);
-          this.form = {};
-          quill.root.innerHTML = "";
-        }
-      });
+      this.$store.commit("postdraft/setpostDraft", this.form);
+    },
+    // 发布攻略
+    handlePost() {
+        var quill = this.$refs.vueEditor.editor;
+        this.form.content = quill.root.innerHTML;
+        const {postTime,...props}=this.form;
+        this.$axios({
+          url: "/posts",
+          headers: {
+            Authorization: `Bearer ${this.$store.state.user.userinfo.token}`
+          },
+          method: "post",
+          data: props
+        }).then(res => {
+          const { message } = res.data;
+          this.$message.success(message);
+          if (message === "新增成功") {
+            this.form = {};
+            var quill = this.$refs.vueEditor.editor;
+            quill.root.innerHTML = "";
+          }
+        });
     },
     handleSelectCity(type) {
       if (this.Cities.length === 0) return false;
@@ -136,7 +140,7 @@ export default {
           url: this.$axios.defaults.baseURL + "/upload",
           name: "files",
           uploadSuccess: (res, insert) => {
-            insert(this.$axios.defaults.baseURL + res.data.url);
+            insert(this.$axios.defaults.baseURL + res.data[0].url);
           }
         }
       }

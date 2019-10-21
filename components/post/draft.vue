@@ -5,12 +5,15 @@
       class="draft"
       v-for="(item,index) in postDraft"
       :key="index"
-      @click="handleEditDraft(item)"
+      
     >
-      <div class="title">
+      <el-row type="flex" justify="space-between">
+        <div class="title" @click="handleEditDraft(item)">
         {{item.title}}
         <i class="iconfont icon44"></i>
       </div>
+       <span @click="handleDelete(index)">移除</span>
+      </el-row>
       <div class="time">{{item.postTime}}</div>
     </div>
   </div>
@@ -20,20 +23,22 @@
 import moment from "moment";
 export default {
   data() {
-    return {};
+    return {
+      postDraft:[]
+    };
   },
-  computed: {
-    postDraft() {
-      const newArr = this.$store.state.postdraft.postDraft.map(v => {
-        moment(v.postTime).format("llll");
-        return v;
-      });
-      return newArr;
-    }
+  mounted(){
+    setTimeout(()=>{
+      this.postDraft=this.$store.state.postdraft.postDraft;
+    },20)
   },
   methods: {
     handleEditDraft(item) {
-      this.$emit('handleeditdraft',item)
+      this.$emit("handleeditdraft", item);
+    },
+    // 删除草稿
+    handleDelete(index){
+      this.$store.commit('postdraft/deletePostDraft',index)
     }
   }
 };
@@ -51,6 +56,8 @@ export default {
   .draft {
     margin: 10px 0;
     .title {
+      width: 130px;
+      overflow: hidden;
       &:hover {
         color: #ffa500;
 
@@ -60,7 +67,22 @@ export default {
     .time {
       font-size: 14px;
       color: #999999;
+      
     }
+    span {
+        display: inline-block;
+        width: 30px;
+        height: 20px;
+        border-radius: 5px;
+        line-height: 20px;
+        background: red;
+        text-align: center;
+        font-size: 12px;
+        color: #ffffff;
+        &:hover {
+          cursor: pointer;
+        }
+      }
   }
 }
 </style>

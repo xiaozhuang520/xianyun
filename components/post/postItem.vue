@@ -87,6 +87,7 @@ export default {
     }
     p {
       margin-top: 20px;
+      height: 60px;
       font-size: 14px;
       color: #666666;
       display: -webkit-box;
