@@ -328,7 +328,6 @@ export default {
       }
     }
     .paging {
-      margin-left: 150px;
       margin-top: 20px;
       margin-bottom: 20px;
     }

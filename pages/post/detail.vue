@@ -37,13 +37,14 @@
             <div class="reply" ref="reply">你发的能放得开</div>
             <i @click="handleDelete">×</i>
           </div>
-          <textarea name id rows="3" placeholder="说点什么吧..." v-model="form.content"></textarea>
+          <textarea style="resize:none;" name id rows="3" placeholder="说点什么吧..." v-model="form.content"></textarea>
           <el-row class="addimg_submint" type="flex" justify="space-between">
             <el-upload
               :action="`${$axios.defaults.baseURL}/upload/`"
               list-type="picture-card"
               :on-remove="handleRemove"
               name="files"
+              ref="upload"
               :on-success="handleAvatarSuccess"
               :on-preview="handlePictureCardPreview"
             >
@@ -179,11 +180,13 @@ export default {
     },
     //发表评论
     handleSubmit() {
+    
       if(!this.form.content){
         this.$message.error('请输入评论内容');
         return;
       }
       this.addComment();
+      this.$refs.upload.clearFiles()
      
     },
     //点赞
@@ -316,8 +319,8 @@ export default {
     width: 700px;
     .reminder{
       width: 100%;
-      height: 50px;
-      line-height: 50px;
+      height: 200px;
+      line-height: 200px;
       text-align: center;
       font-size: 25px;
     }

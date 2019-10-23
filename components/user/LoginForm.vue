@@ -40,7 +40,7 @@ export default {
         if (valid) {
             const res=await this.$store.dispatch('user/login',this.form)
             if(res.status===200){
-              this.$message.success('登录成功')
+              this.$message.success('登录成功,正在跳转')
               this.$router.back()
             }
         }
