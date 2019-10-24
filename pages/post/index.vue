@@ -53,10 +53,13 @@
             </span>
           </el-row>
         </div>
+        
         <!-- 景点详情 -->
         <postItem :data="item" v-for="(item,index) in postList" :key="index" />
+        <div  class="box" style="width:100%;text-align:center;height:200px;line-height:200px;" v-if="postList.length==0">暂无改城市的攻略</div>
         <!-- 分页 -->
         <el-pagination
+        style="margin-left:50px"
           class="paging"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"

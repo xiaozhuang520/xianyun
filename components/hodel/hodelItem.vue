@@ -40,7 +40,7 @@
             </div>
           </div>
           <div class="content_right_detail">
-           <router-link to="https://hotels.ctrip.com/">
+           <a href="https://hotels.ctrip.com/hotel/694679.html">
                 <div class="content_right" v-for="(item,index) in data.products" :key="index">
               <el-row type="flex" justify="space-between">
                 <span>{{item.name}}</span>
@@ -50,7 +50,7 @@
                 </span>
               </el-row>
             </div>
-           </router-link>
+           </a>
             
           </div>
         </el-row>

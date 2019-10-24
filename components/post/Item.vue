@@ -3,10 +3,11 @@
       <Item :data="data.parent" v-if="data.parent" @handlehuifu="handlehuifu"/>
     <el-row class="user" type="flex" justify="space-between">
       <div class="user_info">
+        <img :src="$axios.defaults.baseURL+data.account.defaultAvatar" alt="">
         <span>{{data.account.nickname}}</span>
-        <i>2019-10-19</i>
+        <i>{{data.created_at}}</i>
       </div>
-      <em>1</em>
+      <em>{{data.level}}</em>
     </el-row>
     <div class="content">
       <p>{{data.content}}</p>
@@ -22,6 +23,7 @@
 </template>
 
 <script>
+import moment from 'moment'
 export default {
     name:'Item',
     props:{
@@ -29,6 +31,10 @@ export default {
             type:Object,
             default:{}
         }
+    },
+    mounted(){
+          this.data.created_at=moment(this.data.created_at).format('YYYY-MM-DD HH:mm:ss')
+
     },
     methods:{
         handlehuifu(item){
@@ -49,6 +55,13 @@ export default {
     margin-bottom: 10px;
     margin-top: 5px;
     font-size: 13px;
+    .user_info{
+      img{
+        width: 15px;;
+        height: 15px;
+        border-radius: 50%;
+      }
+    }
     span {
       color: #666666;
     }

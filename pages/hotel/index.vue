@@ -69,18 +69,18 @@
           <el-row type="flex" justify="space-between">
             <div class="area">区域：</div>
             <p ref="p">
-              <router-link to="#">全部</router-link>
+              <router-link to="/hotel">全部</router-link>
 
-              <router-link
-                :to="`/hotel?city=${cityId}&scenic=${item.id}`"
+              <span
+                @click="handleClickSpan(item)"
                 v-for="(item,index) in scenics"
                 :key="index"
-              >{{item.name}}</router-link>
+              >{{item.name}}</span>
             </p>
           </el-row>
-          <a class="icon" href="#" @click="handlezhankai">
+          <span class="icon" href="#" @click="handlezhankai">
             <i class="iconfont iconGroup- jiantou"></i>等43个区域
-          </a>
+          </span>
           <el-row type="flex" justify="space-between">
             <div class="strategy">攻略：</div>
             <p class="strategy1">
@@ -152,8 +152,8 @@
             </el-tooltip>
           </el-row>
         </div>
-        <el-table v-if="hotelDetail.length===0" v-loading="loading" style="width: 100%"></el-table>
-        <div class="right" v-if="hotelDetail.length !==0">
+        <el-table v-if="hotelDetail.length===0 && loading" v-loading="loading" style="width: 100%"></el-table>
+        <div class="right">
           <!-- 地图的容器 -->
           <div id="container"></div>
           <div id="panel"></div>
@@ -172,20 +172,20 @@
           </div>
           <div class="grade">
             <div class="demonstration">住宿等级</div>
-            <el-dropdown class="buxian" v-model="grade">
+            <el-dropdown class="buxian">
               <el-row type="flex" justify="space-between">
-                <span class="el-dropdown-link">不限</span>
+                <span class="el-dropdown-link" v-if="filter.hotellevel.length==0">不限</span>
+                <span v-if="filter.hotellevel.length>0">已选{{filter.hotellevel.length}}项</span>
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </el-row>
               <el-dropdown-menu slot="dropdown" class="dropdown" style="width:100px;">
                 <el-checkbox-group
-                  v-model="checkList"
+                  v-model="filter.hotellevel"
                   v-for="(item,index) in optionList.levels"
                   :key="index"
-                  @change="handleChange"
                 >
                   <el-dropdown-item>
-                    <el-checkbox :label="item.name" :value="item.name"></el-checkbox>
+                    <el-checkbox :label="item.id">{{item.name}}</el-checkbox>
                   </el-dropdown-item>
                 </el-checkbox-group>
               </el-dropdown-menu>
@@ -195,18 +195,18 @@
             <div class="demonstration">住宿类型</div>
             <el-dropdown class="buxian">
               <el-row type="flex" justify="space-between">
-                <span class="el-dropdown-link">不限</span>
+                <span class="el-dropdown-link" v-if="filter.hoteltype.length==0">不限</span>
+                <span v-if="filter.hoteltype.length>0">已选{{filter.hoteltype.length}}项</span>
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </el-row>
               <el-dropdown-menu slot="dropdown" class="dropdown" style="width:150px;">
                 <el-checkbox-group
-                  v-model="checkList"
+                  v-model="filter.hoteltype"
                   v-for="(item,index) in optionList.types"
                   :key="index"
-                  @change="handleChange"
                 >
                   <el-dropdown-item>
-                    <el-checkbox :label="item.name" :value="item.name"></el-checkbox>
+                    <el-checkbox :label="item.id">{{item.name}}</el-checkbox>
                   </el-dropdown-item>
                 </el-checkbox-group>
               </el-dropdown-menu>
@@ -216,18 +216,18 @@
             <div class="demonstration">酒店设施</div>
             <el-dropdown class="buxian">
               <el-row type="flex" justify="space-between">
-                <span class="el-dropdown-link">不限</span>
+                <span class="el-dropdown-link" v-if="filter.hotelasset.length==0">不限</span>
+                <span v-if="filter.hotelasset.length>0">已选{{filter.hotelasset.length}}项</span>
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </el-row>
               <el-dropdown-menu slot="dropdown" class="dropdown" style="width:150px;">
                 <el-checkbox-group
-                  v-model="checkList"
+                  v-model="filter.hotelasset"
                   v-for="(item,index) in optionList.assets"
                   :key="index"
-                  @change="handleChange"
                 >
                   <el-dropdown-item>
-                    <el-checkbox :label="item.name" :value="item.name"></el-checkbox>
+                    <el-checkbox :label="item.id">{{item.name}}</el-checkbox>
                   </el-dropdown-item>
                 </el-checkbox-group>
               </el-dropdown-menu>
@@ -237,7 +237,8 @@
             <div class="demonstration">酒店品牌</div>
             <el-dropdown class="buxian">
               <el-row type="flex" justify="space-between">
-                <span class="el-dropdown-link">不限</span>
+                <span class="el-dropdown-link" v-if="filter.hotelbrand.length==0">不限</span>
+                <span v-if="filter.hotelbrand.length>0">已选{{filter.hotelbrand.length}}项</span>
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </el-row>
               <el-dropdown-menu
@@ -246,13 +247,12 @@
                 style="width:150px;height:200px;line-height:20px;overflow:auto;overflow-x:hidden;"
               >
                 <el-checkbox-group
-                  v-model="checkList"
+                  v-model="filter.hotelbrand"
                   v-for="(item,index) in optionList.brands"
                   :key="index"
-                  @change="handleChange"
                 >
                   <el-dropdown-item>
-                    <el-checkbox :label="item.name" :value="item.name"></el-checkbox>
+                    <el-checkbox :label="item.id">{{item.name}}</el-checkbox>
                   </el-dropdown-item>
                 </el-checkbox-group>
               </el-dropdown-menu>
@@ -261,17 +261,21 @@
         </template>
       </el-row>
     </div>
-    <el-table v-if="hotelDetail.length===0" v-loading="loading" style="width: 100%"></el-table>
-    <hodelItem :data="item" v-for="(item,index) in hotelDetail" :key="index" />
 
+    <hodelItem :data="item" v-for="(item,index) in hotelDetail" :key="index" />
+    <el-table style="width: 100%" v-loading="loading" v-if="loading"></el-table>
+    <div
+      v-if="hotelDetail.length===0 && !loading"
+      style="width:100%;text-align:center;height:150px;line-height:150px"
+    >暂无符合条件的酒店</div>
     <el-pagination
       v-if="!hotelDetail.length==0"
-      style="margin-left:250px"
+      style="margin-left:150px"
       class="paging"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="pageIndex"
-      :page-sizes="[2, 5, 10, 15]"
+      :page-sizes="[3, 5, 10, 15]"
       :page-size="100"
       layout="total, sizes, prev, pager, next, jumper"
       :total="total"
@@ -285,31 +289,27 @@ import moment from "moment";
 export default {
   data() {
     return {
-      // filter: {
-      //   grade: "",
-      //   type: "",
-      //   facility: "",
-      //   brand: ""
-      // },
+      num: 2000,
       checkList: [],
+      filter: {
+        hotellevel: [],
+        hoteltype: [],
+        hotelbrand: [],
+        hotelasset: []
+      },
+      str: "",
       grade: "",
       loading: true,
       // 总人数
       headcount: "",
-      // 酒店数据列表
-      cacheHotelList: {
-        data: []
-      },
       // 城市ID
       cityId: 0,
       // 条数
-      pageSize: 2,
+      pageSize: 3,
       // 开始数据（分页）
       start: 0,
       // 初始页码
       pageIndex: 1,
-      // 初始价格
-      num: 2140,
       //总条数
       total: 0,
       //酒店选项
@@ -403,7 +403,44 @@ export default {
       }
     };
   },
-
+  watch: {
+    filter: {
+      deep: true,
+      handler() {
+        this.loading = true;
+        let str = "";
+        if (this.filter.hotellevel.length !== 0) {
+          this.filter.hotellevel.forEach(v => {
+            str += `&hotellevel_in=${v}`;
+          });
+        }
+        if (this.filter.hoteltype.length !== 0) {
+          this.filter.hoteltype.forEach(v => {
+            str += `&hoteltype_in=${v}`;
+          });
+        }
+        if (this.filter.hotelbrand.length !== 0) {
+          this.filter.hotelbrand.forEach(v => {
+            str += `&hotelbrand_in=${v}`;
+          });
+        }
+        if (this.filter.hotelasset.length !== 0) {
+          this.filter.hotelasset.forEach(v => {
+            str += `&hotelasset_in=${v}`;
+          });
+        }
+        this.str = str;
+        this.getHotelDetail({}, str);
+        this.loading = false;
+        setTimeout(() => {
+          if (!this.hotelDetail.length) {
+            this.map("noShow");
+          }
+          this.map();
+        }, 200);
+      }
+    }
+  },
   async mounted() {
     //  获取城市id
     const res = await this.$axios({
@@ -437,79 +474,67 @@ export default {
     document.head.appendChild(jsapi);
   },
   methods: {
-    handleChange() {
-      // const arr=this.cacheHotelList.data.filter(v=>{
-      //   let valid=true;
-      //   if(v.hotellevel && this.checkList.indexOf(v.hotellevel) ===-1){
-      //       valid=false;
-      //   }
-      //   return valid
-      // })
-      // console.log(arr)
-      // this.hotelDetail=arr;
+    handleClickSpan(item) {
+      this.loading = true;
+      this.$axios({
+        url: `/hotels/?city=${this.cityId}&_limit=${this.pageSize}&_start=${this.start}&scenic=${item.id}`
+      }).then(res => {
+        const { data, total } = res.data;
+        setTimeout(() => {
+          this.loading = false;
+        }, 1000);
+        this.hotelDetail = data;
+        this.total = total;
+      });
     },
+
     //改变价格
     handleInput() {
       this.getHotelDetail();
     },
-    map() {
+    map(isShow) {
       // 地图对象
-       var arr = this.hotelDetail.map(v => {
-        return v.location.latitude;
-
+      var arr = this.hotelDetail.map(v => {
+        return v.location;
       });
-      var arr1 = this.hotelDetail.map(v => {
-        return v.location.longitude;
-      });
-     
       var map = new AMap.Map("container", {
-        zoom: 7, //级别
-     
-        center:[arr1[1],arr[1]],
-        center:[arr1[0], arr[0]],
+        zoom: 4, //级别
         viewMode: "3D" //使用3D视图
       });
-     
+      if (arr.length == 0) return;
+      if (isShow) return;
+
       // 点标记
       var marker1 = new AMap.Marker({
-        position: new AMap.LngLat(arr1[0], arr[0]),
-        offset: new AMap.Pixel(-10, -10),
-        icon: "//vdata.amap.com/icons/b18/1/2.png", // 添加 Icon 图标 URL
-        title: "好来阁商务宾馆"
+        position: new AMap.LngLat(arr[0].longitude, arr[0].latitude),
+        title: this.hotelDetail[0].name
       });
       var marker2 = new AMap.Marker({
-        position: new AMap.LngLat(arr1[1], arr[1]),
-        
-        offset: new AMap.Pixel(-10, -10),
-        icon: "//vdata.amap.com/icons/b18/1/2.png", // 添加 Icon 图标 URL
-        title: "南京古都文化酒店（鼓楼店）(如家联盟)"
+        position: new AMap.LngLat(arr[1].longitude, arr[1].latitude),
+        title: this.hotelDetail[1].name
       });
-      var markerList = [marker1, marker2];
+      var marker3 = new AMap.Marker({
+        position: new AMap.LngLat(arr[2].longitude, arr[2].latitude),
+        title: this.hotelDetail[2].name
+      });
+      var markerList = [marker1, marker2, marker3];
+      if (!this.loading && this.hotelDetail.length == 0) {
+        markerList = [];
+      }
       map.add(markerList); //添加到地图
     },
     //查看价格
     async handleLookPrice() {
-      location.reload();
-      // 获取酒店列表
+      this.loading = true;
       const Data = {
         city: this.cityId,
         enterTime: this.time[0],
-        leftTime: this.time[1],
-        _limit: this.pageSize,
-        _start: this.start
+        leftTime: this.time[1]
       };
-      const hotel = await this.$axios({
-        url: `/hotels/`,
-        params: Data
-      });
-      this.$router.push({
-        path: "/hotel",
-        query: Data
-      });
-      const { data, total } = hotel.data;
-      this.hotelDetail = data;
-
-      this.total = total;
+      this.getHotelDetail(Data);
+      setTimeout(() => {
+        this.loading = false;
+      }, 1000);
     },
     //获取时间
     handleGetTime() {
@@ -528,24 +553,36 @@ export default {
         this.flag = true;
       }
     },
-    // 获取酒店列表
-    async getHotelDetail() {
+    // 获取全部酒店列表数据
+    async getHotelDetail(obj, str) {
       const hotel = await this.$axios({
-        url: `/hotels/`,
-        params: {
-          city: this.cityId,
-          _limit: this.pageSize,
-          _start: this.start
-        }
+        url: `/hotels/?_limit=${this.pageSize}&_start=${this.start}${str}`,
+        params: obj
       });
       const { data, total } = hotel.data;
       this.hotelDetail = data;
-      this.cacheHotelList = { ...hotel.data };
       this.total = total;
+      setTimeout(() => {
+        this.loading = false;
+      }, 1000);
     },
     // 切换评论条数
     handleSizeChange(val) {
+      this.start = 0;
       this.pageSize = val;
+      if (this.time.length !== 0) {
+        this.handleLookPrice();
+        return;
+      }
+      if (
+        this.filter.hotelasset.length !== 0 ||
+        this.filter.hotellevel.length !== 0 ||
+        this.filter.hotelbrand.length !== 0 ||
+        this.filter.hoteltype.length !== 0
+      ) {
+        this.getHotelDetail({}, this.str);
+        return;
+      }
       this.getHotelDetail();
       this.map();
     },
@@ -554,9 +591,22 @@ export default {
       if (val === 1) {
         this.start = 0;
       } else if (val === 2) {
-        this.start = 2;
+        this.start = 3;
       } else {
-        this.start = (val - 1) * 2;
+        this.start = (val - 1) * 3;
+      }
+      if (this.time.length !== 0) {
+        this.handleLookPrice();
+        return;
+      }
+      if (
+        this.filter.hotelasset.length !== 0 ||
+        this.filter.hotellevel.length !== 0 ||
+        this.filter.hotelbrand.length !== 0 ||
+        this.filter.hoteltype.length !== 0
+      ) {
+        this.getHotelDetail({}, this.str);
+        return;
       }
       this.getHotelDetail();
       this.map();
@@ -663,18 +713,25 @@ export default {
         color: #666;
         font-size: 14px;
         a {
+          margin-right: 10px;
+        }
+        span {
           margin-right: 15px;
           color: #666;
           font-size: 14px;
           &:hover {
             text-decoration: underline;
             color: #0099ff;
+            cursor: pointer;
           }
         }
       }
       .icon {
         color: #666;
         margin-left: 60px;
+        &:hover {
+          cursor: pointer;
+        }
         i {
           color: #ff9900;
         }

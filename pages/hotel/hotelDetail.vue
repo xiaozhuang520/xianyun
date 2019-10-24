@@ -42,24 +42,24 @@
     <div class="detail">
       <div class="detail_title">
         <el-row type="flex" justify="space-between">
-          <span>价格来源</span>
-          <span>低价房型</span>
-          <span>最低价格/每晚</span>
+          <el-col :span="10">价格来源</el-col>
+          <el-col :span="10">低价房型</el-col>
+          <el-col :span="4">最低价格/每晚</el-col>
         </el-row>
       </div>
-      <router-link to="http://hotels.ctrip.com/">
+      <a href="https://hotels.ctrip.com/hotel/694679.html">
         <div class="detail_content" v-for="(item,index) in hotelDetail.products" :key="index">
           <el-row type="flex" justify="space-between">
-            <span>{{item.name}}</span>
-            <span>{{item.bestType}}</span>
-            <span class="price">
+            <el-col :span="10">{{item.name}}</el-col>
+            <el-col :span="10">{{item.bestType}}</el-col>
+            <el-col :span="4" class="price">
               ￥{{item.price}}
               <em>起</em>
               <i class="iconfont iconjiantou"></i>
-            </span>
+            </el-col>
           </el-row>
         </div>
-      </router-link>
+      </a>
     </div>
     <div class="map">
       <!-- 地图的容器 -->
@@ -67,7 +67,7 @@
         <div id="container"></div>
 
         <div class="right">
-          <el-tabs type="card" name="1" value="1">
+          <el-tabs type="card" value="1" style="height:100%" @tab-click="handleTabClick">
             <el-tab-pane
               :key="item.name"
               v-for="(item, index) in editableTabs"
@@ -75,7 +75,18 @@
               :name="item.name"
               style="width:200px; height:90px; overflow:hidden;overflow-y:auto;"
             >
-              <P v-for="(data,index) in item.arr" :key="index">{{data.name}}</P>
+              <P
+                v-if="item.name=='1'"
+                style="height:30px;line-height:30px ;overflow:hidden;"
+                v-for="(data,index) in poisList"
+                :key="index"
+              >{{data.name}}</P>
+              <p
+                v-if="item.name=='2'"
+                style="height:30px;line-height:30px ;overflow:hidden;"
+                v-for="(data,index) in poisList"
+                :key="index"
+              >{{data.name}}</p>
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -140,7 +151,7 @@
             :stroke-width="3"
             type="circle"
             :show-text="false"
-            :percentage="hotelDetail.scores.environment *10"
+            :percentage="hotelDetail.scores.environment *10===null?0:hotelDetail.scores.environment *10"
             color="#f7ba2a"
           ></el-progress>
           <p class="environment">
@@ -154,7 +165,7 @@
             :stroke-width="3"
             type="circle"
             :show-text="false"
-            :percentage="hotelDetail.scores.product *10"
+            :percentage="hotelDetail.scores.product *10===null?0:hotelDetail.scores.product *10"
             color="#f7ba2a"
           ></el-progress>
           <p class="environment">
@@ -168,7 +179,7 @@
             :stroke-width="3"
             type="circle"
             :show-text="false"
-            :percentage="hotelDetail.scores.service *10"
+            :percentage="hotelDetail.scores.service *10 ===null?0:hotelDetail.scores.service *10"
             color="#f7ba2a"
           ></el-progress>
           <p class="environment">
@@ -195,14 +206,14 @@ export default {
         "/_nuxt/assets/images/5.jpg",
         "/_nuxt/assets/images/6.jpg"
       ],
+
       tableData: [],
 
       editableTabsValue: "2",
       editableTabs: [
         {
           title: "风景",
-          name: "1",
-          arr: [{ name: "没但考虑到" }, { name: "没但考虑到" }]
+          name: "1"
         },
         {
           title: "交通",
@@ -211,44 +222,28 @@ export default {
       ],
       tabIndex: 2,
       hotelDetail: {
-        scores: {}
-      }
+        scores: {},
+        location: {}
+      },
+      poisList: [],
+      cachepois: {},
+      flag: true
     };
   },
-  mounted() {
+  async mounted() {
     //获取酒店详情数据
-    this.$axios({
+    const result = await this.$axios({
       url: `/hotels?id=${this.$route.query.id}`
-    }).then(res => {
-      const { data } = res.data;
-      this.hotelDetail = data[0];
-
-      console.log(this.hotelDetail);
     });
+
+    const { data } = result.data;
+    this.hotelDetail = data[0];
+
+    this.getFengjing();
+
     // 整个页面加载完毕之后执行
     window.onLoad = () => {
-      // 地图对象
-      var map = new AMap.Map("container", {
-        zoom: 15, //级别
-        center: [
-          this.hotelDetail.location.longitude,
-          this.hotelDetail.location.latitude
-        ], //中心点坐标
-        viewMode: "3D" //使用3D视图
-      });
-
-      // 点标记
-      var marker1 = new AMap.Marker({
-        position: [
-          this.hotelDetail.location.longitude,
-          this.hotelDetail.location.latitude
-        ], //位置
-        offset: new AMap.Pixel(-10, -10),
-        icon: "//vdata.amap.com/icons/b18/1/2.png", // 添加 Icon 图标 URL
-        title: `${this.hotelDetail.name}`
-      });
-      var markerList = [marker1];
-      map.add(markerList); //添加到地图
+      this.map();
     };
     // 地图的连接
     var url =
@@ -259,8 +254,52 @@ export default {
     document.head.appendChild(jsapi);
   },
   methods: {
+    async getFengjing() {
+      const res = await this.$axios({
+        url: `https://restapi.amap.com/v3/place/text?rectangle=116.351147,39.966309;116.357134,39.968727&key=0f20256dccf79ff8a575e0a1a1dc8d86&location=${this.hotelDetail.location.longitude},${this.hotelDetail.location.latitude}&city=南京&types=风景名胜`
+      });
+
+      const { pois } = res.data;
+      this.poisList = pois;
+      this.cachepois = { ...res.data };
+    },
+    map() {
+      // 地图对象
+      var map = new AMap.Map("container", {
+        zoom: 12, //级别
+        center: [
+          this.hotelDetail.location.longitude,
+          this.hotelDetail.location.latitude
+        ], //中心点坐标
+        viewMode: "3D" //使用3D视图
+      });
+      var marker1 = new AMap.Marker({
+        position: new AMap.LngLat(
+          this.hotelDetail.location.longitude,
+          this.hotelDetail.location.latitude
+        ),
+        title: this.hotelDetail.name
+      });
+
+      var markerList = [marker1];
+      map.add(markerList); //添加到地图
+    },
     handleImg(item) {
       this.url = item;
+    },
+    handleTabClick() {
+      if (this.flag) {
+        this.$axios({
+          url: `https://restapi.amap.com/v3/place/text?rectangle=116.351147,39.966309;116.357134,39.968727&key=0f20256dccf79ff8a575e0a1a1dc8d86&location=${this.hotelDetail.location.longitude},${this.hotelDetail.location.latitude}&city=南京&types=交通设施服务`
+        }).then(res => {
+          const { pois } = res.data;
+          this.poisList = pois;
+        });
+        this.flag=false;
+      }else{
+        this.getFengjing();
+        this.flag=true;
+      }
     }
   }
 };
@@ -313,6 +352,11 @@ export default {
     margin-top: 40px;
     .right {
       width: 330px;
+      p {
+        &:hover {
+          cursor: pointer;
+        }
+      }
     }
   }
   .essential {
@@ -422,6 +466,9 @@ export default {
       }
     }
   }
+}
+/deep/ .el-tab-pane {
+  height: 300px !important;
 }
 #container {
   width: 650px;

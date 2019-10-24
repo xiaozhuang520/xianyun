@@ -61,7 +61,12 @@ export default {
       this.form.postTime = newPostTime;
       var quill = this.$refs.vueEditor.editor;
       this.form.content = quill.root.innerHTML;
+      if(!this.form.title){
+        this.$message.success('请输入你要保存的内容')
+        return;
+      }
       this.$store.commit("postdraft/setpostDraft", this.form);
+      this.$message.success('保存成功')
     },
     // 发布攻略
     handlePost() {

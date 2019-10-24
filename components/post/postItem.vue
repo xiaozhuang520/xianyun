@@ -55,7 +55,11 @@ export default {
       default: {}
     }
   },
-  mounted() {}
+  mounted() {
+    // setTimeout(()=>{
+    //   console.log(this.data)
+    // },20)
+  }
 };
 </script>
 

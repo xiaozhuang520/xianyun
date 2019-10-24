@@ -39,6 +39,7 @@ export default {
     // 删除草稿
     handleDelete(index){
       this.$store.commit('postdraft/deletePostDraft',index)
+      this.$message.success('移除成功')
     }
   }
 };

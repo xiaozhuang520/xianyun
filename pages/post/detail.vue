@@ -8,7 +8,7 @@
         </div>
         <h2>{{detail.title}}</h2>
         <div class="detail_strategy">
-          <span>攻略: {{detail.city.created_at}}</span>
+          <span>攻略: {{detail.created_at}}</span>
           <i>阅读：{{detail.watch===null?0:detail.watch}}</i>
         </div>
         <div class="content" v-html="detail.content"></div>
@@ -37,7 +37,7 @@
             <div class="reply" ref="reply">你发的能放得开</div>
             <i @click="handleDelete">×</i>
           </div>
-          <textarea style="resize:none;" name id rows="3" placeholder="说点什么吧..." v-model="form.content"></textarea>
+          <textarea ref="textarea" style="resize:none;" name id rows="3" placeholder="说点什么吧..." v-model="form.content"></textarea>
           <el-row class="addimg_submint" type="flex" justify="space-between">
             <el-upload
               :action="`${$axios.defaults.baseURL}/upload/`"
@@ -61,7 +61,7 @@
               <div class="user_info">
                 <img :src="$axios.defaults.baseURL+item.account.defaultAvatar" alt />
                 <span>{{item.account.nickname}}</span>
-                <i>2019-10-19</i>
+                <i>{{item.created_at}}</i>
               </div>
               <em>{{index+1}}</em>
             </el-row>
@@ -82,6 +82,7 @@
           <el-row type="flex" justify="center" v-if="postComments.length !==0">
             <el-pagination
               class="paging"
+              style="margin-top:20px"
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
               :current-page="pageIndex"
@@ -110,6 +111,7 @@
 <script>
 import CommentItem from "@/components/post/commentItem";
 import Item from "@/components/post/Item";
+import moment from 'moment'
 export default {
   data() {
     return {
@@ -143,6 +145,7 @@ export default {
       this.isShow = true;
       this.$refs.reply.innerHTML = `回复 @${item.account.nickname}`;
       this.replyData=item;
+      this.$refs.textarea.focus()
     },
     //提交评论
     addComment() {
@@ -162,6 +165,7 @@ export default {
         const { message } = res.data;
         this.$message.success(message);
         this.form.content = "";
+        this.form.pics=[];
         this.isShow = false;
         this.start=0;
         this.getpostComments();
@@ -177,6 +181,7 @@ export default {
       this.isShow = true;
       this.$refs.reply.innerHTML = `回复 @${data.account.nickname}`;
       this.replyData=data;
+      this.$refs.textarea.focus()
     },
     //发表评论
     handleSubmit() {
@@ -266,6 +271,7 @@ export default {
       }).then(res => {
         const { data } = res.data;
         this.detail = data[0];
+        this.detail.created_at=moment(this.detail.created_at).format('YYYY-MM-DD HH:mm:ss')
       });
     },
     // 点击右侧文章加载文章详情
@@ -284,6 +290,11 @@ export default {
         }
       }).then(res => {
         const { data, total } = res.data;
+        
+        const arr=data.map(v=>{
+          v.created_at=moment(v.created_at).format('YYYY-MM-DD HH:mm:ss')
+          return v
+        })
         this.postComments = data;
         this.total = total;
       });

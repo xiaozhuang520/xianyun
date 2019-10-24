@@ -10,7 +10,7 @@
           <p>{{data.title}}</p>
         </div>
         <div class="time_read">
-          <span>2019-10-20 4:22</span>
+          <span>{{data.created_at}}</span>
           <i>阅读: {{data.watch===null?0:data.watch}}</i>
         </div>
       </div>
@@ -20,12 +20,17 @@
 </template>
 
 <script>
+import moment from 'moment'
 export default {
     props:{
         data:{
             type:Object,
             default:{}
         }
+    },
+ 
+    mounted(){
+       this.data.created_at=moment(this.data.created_at).format('YYYY-MM-DD')
     },
     watch:{
       $route(){
