@@ -61,34 +61,34 @@ export default {
       this.form.postTime = newPostTime;
       var quill = this.$refs.vueEditor.editor;
       this.form.content = quill.root.innerHTML;
-      if(!this.form.title){
-        this.$message.success('请输入你要保存的内容')
+      if (!this.form.title) {
+        this.$message.success("请输入你要保存的内容");
         return;
       }
       this.$store.commit("postdraft/setpostDraft", this.form);
-      this.$message.success('保存成功')
+      this.$message.success("保存成功");
     },
     // 发布攻略
     handlePost() {
-        var quill = this.$refs.vueEditor.editor;
-        this.form.content = quill.root.innerHTML;
-        const {postTime,...props}=this.form;
-        this.$axios({
-          url: "/posts",
-          headers: {
-            Authorization: `Bearer ${this.$store.state.user.userinfo.token}`
-          },
-          method: "post",
-          data: props
-        }).then(res => {
-          const { message } = res.data;
-          this.$message.success(message);
-          if (message === "新增成功") {
-            this.form = {};
-            var quill = this.$refs.vueEditor.editor;
-            quill.root.innerHTML = "";
-          }
-        });
+      var quill = this.$refs.vueEditor.editor;
+      this.form.content = quill.root.innerHTML;
+      const { postTime, ...props } = this.form;
+      this.$axios({
+        url: "/posts",
+        headers: {
+          Authorization: `Bearer ${this.$store.state.user.userinfo.token}`
+        },
+        method: "post",
+        data: props
+      }).then(res => {
+        const { message } = res.data;
+        this.$message.success(message);
+        if (message === "新增成功") {
+          this.form = {};
+          var quill = this.$refs.vueEditor.editor;
+          quill.root.innerHTML = "";
+        }
+      });
     },
     handleSelectCity(type) {
       if (this.Cities.length === 0) return false;

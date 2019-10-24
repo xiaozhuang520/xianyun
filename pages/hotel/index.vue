@@ -588,8 +588,7 @@ export default {
     },
     // 切换评论条数
     handleSizeChange(val) {
-      this.pageIndex=1;
-      console.log(this.pageIndex)
+      this.pageIndex = 1;
       this.start = 0;
       this.pageSize = val;
       if (this.time.length !== 0) {

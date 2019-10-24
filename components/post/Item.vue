@@ -1,9 +1,9 @@
 <template>
   <div class="containar">
-      <Item :data="data.parent" v-if="data.parent" @handlehuifu="handlehuifu"/>
+    <Item :data="data.parent" v-if="data.parent" @handlehuifu="handlehuifu" />
     <el-row class="user" type="flex" justify="space-between">
       <div class="user_info">
-        <img :src="$axios.defaults.baseURL+data.account.defaultAvatar" alt="">
+        <img :src="$axios.defaults.baseURL+data.account.defaultAvatar" alt />
         <span>{{data.account.nickname}}</span>
         <i>{{data.created_at}}</i>
       </div>
@@ -14,7 +14,6 @@
       <el-row type="flex" justify="start">
         <div class="content_img" v-for="(item,index) in data.pics" v-if="data.pics">
           <img :src="$axios.defaults.baseURL+item.url" alt />
-           
         </div>
       </el-row>
       <span class="reply" @click="handlehuifu(data)">回复</span>
@@ -23,25 +22,25 @@
 </template>
 
 <script>
-import moment from 'moment'
+import moment from "moment";
 export default {
-    name:'Item',
-    props:{
-        data:{
-            type:Object,
-            default:{}
-        }
-    },
-    mounted(){
-          this.data.created_at=moment(this.data.created_at).format('YYYY-MM-DD HH:mm:ss')
-
-    },
-    methods:{
-        handlehuifu(item){
-            this.$emit('handlehuifu',item)
-        }
+  name: "Item",
+  props: {
+    data: {
+      type: Object,
+      default: {}
     }
-
+  },
+  mounted() {
+    this.data.created_at = moment(this.data.created_at).format(
+      "YYYY-MM-DD HH:mm:ss"
+    );
+  },
+  methods: {
+    handlehuifu(item) {
+      this.$emit("handlehuifu", item);
+    }
+  }
 };
 </script>
 
@@ -55,9 +54,9 @@ export default {
     margin-bottom: 10px;
     margin-top: 5px;
     font-size: 13px;
-    .user_info{
-      img{
-        width: 15px;;
+    .user_info {
+      img {
+        width: 15px;
         height: 15px;
         border-radius: 50%;
       }
@@ -70,7 +69,7 @@ export default {
     }
   }
   .content {
-      position: relative;
+    position: relative;
     width: 100%;
     p {
       margin-bottom: 10px;
@@ -86,19 +85,18 @@ export default {
         height: 100%;
       }
     }
-    span{
-          position: absolute;
-          display: none;
-          right: 0;
-          bottom: 0;
-          font-size: 14px;
-      
-        }
-        &:hover span{
-          display: block;
-          color: #ffa500;
-          cursor: pointer;
-        }
+    span {
+      position: absolute;
+      display: none;
+      right: 0;
+      bottom: 0;
+      font-size: 14px;
+    }
+    &:hover span {
+      display: block;
+      color: #ffa500;
+      cursor: pointer;
+    }
   }
 }
 </style>

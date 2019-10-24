@@ -172,17 +172,20 @@ export default {
         air: this.$route.query.id
       };
       // 判断证件号码
-      const result= this.users.map(v=>{
-        if(!/(^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$)/.test(v.id)){
+      const result = this.users.map(v => {
+        if (
+          !/(^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$)/.test(
+            v.id
+          )
+        ) {
           this.$message.error("证件号码格式不正确");
-          return 'false';
-        }else{
-          return 'true';
+          return "false";
+        } else {
+          return "true";
         }
-      })
-      if(result.indexOf('false')>-1)return;
-        
-      
+      });
+      if (result.indexOf("false") > -1) return;
+
       const res = await this.$axios({
         url: "/airorders",
         headers: {
@@ -193,13 +196,13 @@ export default {
       });
 
       const { message } = res.data;
-     
+
       if (message === "订单提交成功") {
         this.$router.push({
           path: "/air/pay",
-          query:{
-            id:res.data.data.id
-          } 
+          query: {
+            id: res.data.data.id
+          }
         });
       }
     }

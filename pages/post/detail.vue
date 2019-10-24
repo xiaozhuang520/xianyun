@@ -37,7 +37,15 @@
             <div class="reply" ref="reply">你发的能放得开</div>
             <i @click="handleDelete">×</i>
           </div>
-          <textarea ref="textarea" style="resize:none;" name id rows="3" placeholder="说点什么吧..." v-model="form.content"></textarea>
+          <textarea
+            ref="textarea"
+            style="resize:none;"
+            name
+            id
+            rows="3"
+            placeholder="说点什么吧..."
+            v-model="form.content"
+          ></textarea>
           <el-row class="addimg_submint" type="flex" justify="space-between">
             <el-upload
               :action="`${$axios.defaults.baseURL}/upload/`"
@@ -66,7 +74,7 @@
               <em>{{index+1}}</em>
             </el-row>
             <div class="content">
-              <Item :data="item.parent" v-if="item.parent"  @handlehuifu="handleHuiFu"/>
+              <Item :data="item.parent" v-if="item.parent" @handlehuifu="handleHuiFu" />
               <div class="mian">
                 <p>{{item.content}}</p>
                 <el-row type="flex" justify="start">
@@ -111,7 +119,7 @@
 <script>
 import CommentItem from "@/components/post/commentItem";
 import Item from "@/components/post/Item";
-import moment from 'moment'
+import moment from "moment";
 export default {
   data() {
     return {
@@ -141,11 +149,11 @@ export default {
   },
   methods: {
     //点击子项回复按钮
-    handleHuiFu(item){
+    handleHuiFu(item) {
       this.isShow = true;
       this.$refs.reply.innerHTML = `回复 @${item.account.nickname}`;
-      this.replyData=item;
-      this.$refs.textarea.focus()
+      this.replyData = item;
+      this.$refs.textarea.focus();
     },
     //提交评论
     addComment() {
@@ -165,34 +173,32 @@ export default {
         const { message } = res.data;
         this.$message.success(message);
         this.form.content = "";
-        this.form.pics=[];
+        this.form.pics = [];
         this.isShow = false;
-        this.start=0;
+        this.start = 0;
         this.getpostComments();
       });
     },
     //移除回复按钮
     handleDelete() {
       this.isShow = false;
-      this.replyData='';
+      this.replyData = "";
     },
     //点击回复按钮
     handleReply(data) {
       this.isShow = true;
       this.$refs.reply.innerHTML = `回复 @${data.account.nickname}`;
-      this.replyData=data;
-      this.$refs.textarea.focus()
+      this.replyData = data;
+      this.$refs.textarea.focus();
     },
     //发表评论
     handleSubmit() {
-    
-      if(!this.form.content){
-        this.$message.error('请输入评论内容');
+      if (!this.form.content) {
+        this.$message.error("请输入评论内容");
         return;
       }
       this.addComment();
-      this.$refs.upload.clearFiles()
-     
+      this.$refs.upload.clearFiles();
     },
     //点赞
     handleLike() {
@@ -271,7 +277,9 @@ export default {
       }).then(res => {
         const { data } = res.data;
         this.detail = data[0];
-        this.detail.created_at=moment(this.detail.created_at).format('YYYY-MM-DD HH:mm:ss')
+        this.detail.created_at = moment(this.detail.created_at).format(
+          "YYYY-MM-DD HH:mm:ss"
+        );
       });
     },
     // 点击右侧文章加载文章详情
@@ -290,11 +298,11 @@ export default {
         }
       }).then(res => {
         const { data, total } = res.data;
-        
-        const arr=data.map(v=>{
-          v.created_at=moment(v.created_at).format('YYYY-MM-DD HH:mm:ss')
-          return v
-        })
+
+        const arr = data.map(v => {
+          v.created_at = moment(v.created_at).format("YYYY-MM-DD HH:mm:ss");
+          return v;
+        });
         this.postComments = data;
         this.total = total;
       });
@@ -328,7 +336,7 @@ export default {
   margin-top: 20px;
   .left {
     width: 700px;
-    .reminder{
+    .reminder {
       width: 100%;
       height: 200px;
       line-height: 200px;

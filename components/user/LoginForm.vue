@@ -1,7 +1,7 @@
 <template>
   <el-form :model="form" ref="form" :rules="rules" class="form">
     <el-form-item class="form-item" prop="username">
-      <el-input v-model="form.username" placeholder="用户名/手机" ></el-input>
+      <el-input v-model="form.username" placeholder="用户名/手机"></el-input>
     </el-form-item>
 
     <el-form-item class="form-item" prop="password">
@@ -38,11 +38,11 @@ export default {
     handleLoginSubmit() {
       this.$refs.form.validate(async valid => {
         if (valid) {
-            const res=await this.$store.dispatch('user/login',this.form)
-            if(res.status===200){
-              this.$message.success('登录成功,正在跳转')
-              this.$router.back()
-            }
+          const res = await this.$store.dispatch("user/login", this.form);
+          if (res.status === 200) {
+            this.$message.success("登录成功,正在跳转");
+            this.$router.back();
+          }
         }
       });
     }

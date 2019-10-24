@@ -267,7 +267,7 @@ export default {
     map() {
       // 地图对象
       var map = new AMap.Map("container", {
-        zoom: 14 , //级别
+        zoom: 14, //级别
         center: [
           this.hotelDetail.location.longitude,
           this.hotelDetail.location.latitude
@@ -276,86 +276,67 @@ export default {
       });
       setTimeout(() => {
         var arr = this.cachepois.map(v => {
-           return v.location.split(",");
+          return v.location.split(",");
         });
         var marker1 = new AMap.Marker({
-          position: new AMap.LngLat(
-            arr[0][0],
-            arr[0][1]
-          ),
+          position: new AMap.LngLat(arr[0][0], arr[0][1]),
           title: this.cachepois[0].name
         });
-         marker1.setLabel({
-		        offset: new AMap.Pixel(6, 6),
-		        content: "1"
-         })
-        
+        marker1.setLabel({
+          offset: new AMap.Pixel(6, 6),
+          content: "1"
+        });
+
         var marker2 = new AMap.Marker({
-          position: new AMap.LngLat(
-            arr[1][0],
-            arr[1][1]
-          ),
+          position: new AMap.LngLat(arr[1][0], arr[1][1]),
           title: this.cachepois[1].name
         });
         var marker3 = new AMap.Marker({
-          position: new AMap.LngLat(
-            arr[2][0],
-            arr[2][1]
-          ),
+          position: new AMap.LngLat(arr[2][0], arr[2][1]),
           title: this.cachepois[2].name
         });
         var marker4 = new AMap.Marker({
-          position: new AMap.LngLat(
-            arr[3][0],
-            arr[3][1]
-          ),
+          position: new AMap.LngLat(arr[3][0], arr[3][1]),
           title: this.cachepois[3].name
         });
         var marker5 = new AMap.Marker({
-          position: new AMap.LngLat(
-            arr[4][0],
-            arr[4][1]
-          ),
+          position: new AMap.LngLat(arr[4][0], arr[4][1]),
           title: this.cachepois[4].name
         });
         var marker6 = new AMap.Marker({
-          position: new AMap.LngLat(
-            arr[5][0],
-            arr[5][1]
-          ),
+          position: new AMap.LngLat(arr[5][0], arr[5][1]),
           title: this.cachepois[5].name
         });
         var marker7 = new AMap.Marker({
-          position: new AMap.LngLat(
-            arr[6][0],
-            arr[6][1]
-          ),
+          position: new AMap.LngLat(arr[6][0], arr[6][1]),
           title: this.cachepois[6].name
         });
         var marker8 = new AMap.Marker({
-          position: new AMap.LngLat(
-            arr[7][0],
-            arr[7][1]
-          ),
+          position: new AMap.LngLat(arr[7][0], arr[7][1]),
           title: this.cachepois[7].name
         });
         var marker9 = new AMap.Marker({
-          position: new AMap.LngLat(
-            arr[8][0],
-            arr[8][1]
-          ),
+          position: new AMap.LngLat(arr[8][0], arr[8][1]),
           title: this.cachepois[8].name
         });
         var marker10 = new AMap.Marker({
-          position: new AMap.LngLat(
-            arr[9][0],
-            arr[9][1]
-          ),
+          position: new AMap.LngLat(arr[9][0], arr[9][1]),
           title: this.cachepois[9].name
         });
-        var markerList = [marker1,marker2,marker3,marker4,marker5,marker6,marker7,marker8,marker9,marker10];
+        var markerList = [
+          marker1,
+          marker2,
+          marker3,
+          marker4,
+          marker5,
+          marker6,
+          marker7,
+          marker8,
+          marker9,
+          marker10
+        ];
         map.add(markerList); //添加到地图
-      },200);
+      }, 200);
     },
     handleImg(item) {
       this.url = item;
@@ -367,8 +348,8 @@ export default {
         }).then(res => {
           const { pois } = res.data;
           this.poisList = pois;
-           this.cachepois = res.data.pois;
-           this.map();
+          this.cachepois = res.data.pois;
+          this.map();
         });
         this.flag = false;
       } else {

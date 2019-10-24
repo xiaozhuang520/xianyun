@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { async } from 'q';
+import { async } from "q";
 export default {
   data() {
     var validatePass = (rule, value, callback) => {
@@ -55,47 +55,40 @@ export default {
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" }
         ],
-        captcha: [
-          { required: true, message: "请输入验证码", trigger: "blur" }
-        ],
-        nickname: [
-            { required: true, message: '请输入昵称', trigger: 'blur' }
-            
-          ],
-          password: [
-            { required: true, message: '请输入密码', trigger: 'blur' }
-            
-          ],
-           checkPassword: [
-            { validator: validatePass, trigger: 'blur' }
-          ]
+        captcha: [{ required: true, message: "请输入验证码", trigger: "blur" }],
+        nickname: [{ required: true, message: "请输入昵称", trigger: "blur" }],
+        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        checkPassword: [{ validator: validatePass, trigger: "blur" }]
       }
     };
   },
   methods: {
     // 发送验证码
     async handleSendCaptcha() {
-        if(!this.form.username){
-            this.$message.error('请输入手机号')
-            return;
-        }
-        const res=await this.$store.dispatch('user/sendcaptcha',this.form.username)
-        const {code}=res.data
-        this.$message.success('你当前的验证码为:'+code)
+      if (!this.form.username) {
+        this.$message.error("请输入手机号");
+        return;
+      }
+      const res = await this.$store.dispatch(
+        "user/sendcaptcha",
+        this.form.username
+      );
+      const { code } = res.data;
+      this.$message.success("你当前的验证码为:" + code);
     },
 
     // 注册
     handleRegSubmit() {
-      this.$refs.form.validate(async (valid)=>{
-          if(valid){
-              const {checkPassword,...props}=this.form
-              const res=await this.$store.dispatch('user/register',props)
-               if(res.status===200){
-                this.$message.success('注册成功')
-               this.$router.push('/')
-            }
+      this.$refs.form.validate(async valid => {
+        if (valid) {
+          const { checkPassword, ...props } = this.form;
+          const res = await this.$store.dispatch("user/register", props);
+          if (res.status === 200) {
+            this.$message.success("注册成功");
+            this.$router.push("/");
           }
-      })
+        }
+      });
     }
   }
 };

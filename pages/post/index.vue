@@ -5,7 +5,13 @@
       <div class="left">
         <div class="nav" @mouseleave="handleLeave">
           <ul>
-            <li v-for="(item,index) in cities" :key="index" @mouseenter="enter(item,index)" @mouseleave="leave(index)" ref="li">
+            <li
+              v-for="(item,index) in cities"
+              :key="index"
+              @mouseenter="enter(item,index)"
+              @mouseleave="leave(index)"
+              ref="li"
+            >
               {{item.type}}
               <span class="iconfont iconjiantou"></span>
             </li>
@@ -47,19 +53,23 @@
           <el-row type="flex" justify="space-between">
             <h2>推荐攻略</h2>
             <span class="write_travel">
-             <router-link to="/post/create">
+              <router-link to="/post/create">
                 <i class="iconfont icon44"></i> 写游记
-             </router-link>
+              </router-link>
             </span>
           </el-row>
         </div>
-        
+
         <!-- 景点详情 -->
         <postItem :data="item" v-for="(item,index) in postList" :key="index" />
-        <div  class="box" style="width:100%;text-align:center;height:200px;line-height:200px;" v-if="postList.length==0">暂无改城市的攻略</div>
+        <div
+          class="box"
+          style="width:100%;text-align:center;height:200px;line-height:200px;"
+          v-if="postList.length==0"
+        >暂无改城市的攻略</div>
         <!-- 分页 -->
         <el-pagination
-        style="margin-left:50px"
+          style="margin-left:50px"
           class="paging"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -87,7 +97,7 @@ export default {
       postList: [],
       // 城市
       city: "",
-      index:0,
+      index: 0,
       // 推荐城市
       recommendCity: [
         {
@@ -139,21 +149,21 @@ export default {
       }
     },
     // 导航菜单显示与隐藏
-    enter(item,index) {
-      this.$refs.li[index].className="active";
+    enter(item, index) {
+      this.$refs.li[index].className = "active";
       this.cityData = item.children;
       this.status = true;
     },
-    leave(index){
-      this.$refs.li[index].className="";
-      this.index=index;
+    leave(index) {
+      this.$refs.li[index].className = "";
+      this.index = index;
     },
     handleEnter(index) {
-      this.$refs.li[this.index].className="active";
+      this.$refs.li[this.index].className = "active";
       this.status = true;
     },
     handleLeave() {
-      this.$refs.li[this.index].className="";
+      this.$refs.li[this.index].className = "";
       this.status = false;
     },
     // 点击导航右侧切换城市
@@ -163,8 +173,8 @@ export default {
       this.getPostCity(`&city=${city}`);
     },
     handleSizeChange(val) {
-      this.pageSize=val;
-      this.getPostCity()
+      this.pageSize = val;
+      this.getPostCity();
     },
     handleCurrentChange(val) {
       if (val === 1) {
@@ -172,20 +182,20 @@ export default {
       } else if (val === 2) {
         this.start = 3;
       } else {
-        this.start = (val-1) * 3;
+        this.start = (val - 1) * 3;
       }
       this.getPostCity();
     },
     //点击推荐下的城市搜索城市
-    handleSelectCity(city){
+    handleSelectCity(city) {
       this.city = city;
       this.getPostCity(`&city=${city}`);
     },
     //点击搜索图标切换城市
-    handleSearch(){
-        const city=this.city;
-        if(!city)return;
-        this.getPostCity(`&city=${city}`);
+    handleSearch() {
+      const city = this.city;
+      if (!city) return;
+      this.getPostCity(`&city=${city}`);
     }
   },
   components: {
@@ -293,7 +303,7 @@ export default {
         font-size: 25px;
         font-weight: 600;
         color: #ffa500;
-        cursor:pointer;
+        cursor: pointer;
       }
     }
     .recommend {
@@ -336,8 +346,8 @@ export default {
     }
   }
 }
-.active{
-  border-right:1px solid #fff;
+.active {
+  border-right: 1px solid #fff;
   color: #ffa500;
 }
 </style>

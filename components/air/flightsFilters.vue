@@ -18,22 +18,17 @@
         </el-select>
       </el-col>
       <el-col :span="4">
-        <el-select
-          size="mini"
-          v-model="filters.flightTimes"
-          placeholder="起飞时间"
-          
-        >
+        <el-select size="mini" v-model="filters.flightTimes" placeholder="起飞时间">
           <el-option
             v-for="(item,index) in data.options.flightTimes"
             :key="index"
-            :label='item.from+":00-"+item.to+":00"'
+            :label="item.from+":00-"+item.to+":00""
             :value="item.from+','+item.to"
           ></el-option>
         </el-select>
       </el-col>
       <el-col :span="4">
-        <el-select size="mini" v-model="filters.company" placeholder="航空公司" >
+        <el-select size="mini" v-model="filters.company" placeholder="航空公司">
           <el-option
             v-for="(item,index) in data.options.company"
             :key="index"
@@ -43,7 +38,7 @@
         </el-select>
       </el-col>
       <el-col :span="4">
-        <el-select size="mini" v-model="filters.airSize" placeholder="机型" >
+        <el-select size="mini" v-model="filters.airSize" placeholder="机型">
           <el-option
             v-for="(item,index) in airplaneModel"
             :key="index"
@@ -96,8 +91,7 @@ export default {
     filters: {
       deep: true,
       handler() {
-         
-        const arr=this.data.flights.filter(v => {
+        const arr = this.data.flights.filter(v => {
           let valid = true;
           if (this.filters.airSize && this.filters.airSize !== v.plane_size) {
             valid = false;
@@ -112,10 +106,13 @@ export default {
             valid = false;
           }
           if (this.filters.flightTimes) {
-              const start = this.filters.flightTimes.split(",");
-            if (+v.dep_time.split(":")[0] > +v.arr_time.split(":")[0] || +v.dep_time.split(":")[0] < +start[0] ||
-                +v.dep_time.split(":")[0] >= +start[1]) {
-              valid=false
+            const start = this.filters.flightTimes.split(",");
+            if (
+              +v.dep_time.split(":")[0] > +v.arr_time.split(":")[0] ||
+              +v.dep_time.split(":")[0] < +start[0] ||
+              +v.dep_time.split(":")[0] >= +start[1]
+            ) {
+              valid = false;
             }
           }
           return valid;
@@ -125,8 +122,6 @@ export default {
     }
   },
   methods: {
-    
-
     // 撤销条件时候触发
     handleFiltersCancel() {}
   }
