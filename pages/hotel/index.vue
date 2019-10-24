@@ -152,10 +152,10 @@
             </el-tooltip>
           </el-row>
         </div>
-        <div v-if="hotelDetail.length===0 && loading" v-loading="loading" style="width: 100%">
+        <div v-if="hotelDetail.length===0 && loading" v-loading="loading" style="width: 100% ;position:absolute;left:600px;">
           <img src="../../assets/images/loading.gif" alt="">
         </div>
-        <div class="right" v-if="hotelDetail.length!==0">
+        <div class="right">
           <!-- 地图的容器 -->
           <div id="container"></div>
           <div id="panel"></div>
