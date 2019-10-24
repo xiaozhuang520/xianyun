@@ -65,7 +65,6 @@
       <!-- 地图的容器 -->
       <el-row type="flex" justify="space-between">
         <div id="container"></div>
-
         <div class="right">
           <el-tabs type="card" value="1" style="height:100%" @tab-click="handleTabClick">
             <el-tab-pane
@@ -206,7 +205,6 @@ export default {
         "/_nuxt/assets/images/5.jpg",
         "/_nuxt/assets/images/6.jpg"
       ],
-
       tableData: [],
 
       editableTabsValue: "2",
@@ -349,6 +347,7 @@ export default {
           const { pois } = res.data;
           this.poisList = pois;
           this.cachepois = res.data.pois;
+          
           this.map();
         });
         this.flag = false;

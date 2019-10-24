@@ -152,8 +152,10 @@
             </el-tooltip>
           </el-row>
         </div>
-        <el-table v-if="hotelDetail.length===0 && loading" v-loading="loading" style="width: 100%"></el-table>
-        <div class="right">
+        <div v-if="hotelDetail.length===0 && loading" v-loading="loading" style="width: 100%">
+          <img src="../../assets/images/loading.gif" alt="">
+        </div>
+        <div class="right" v-if="hotelDetail.length!==0">
           <!-- 地图的容器 -->
           <div id="container"></div>
           <div id="panel"></div>
@@ -263,7 +265,9 @@
     </div>
 
     <hodelItem :data="item" v-for="(item,index) in hotelDetail" :key="index" />
-    <el-table style="width: 100%" v-loading="loading" v-if="loading"></el-table>
+    <div style="width: 100%;text-align:center;" v-loading="loading" v-if="loading">
+      <img src="../../assets/images/loading.gif" alt="">
+    </div>
     <div
       v-if="hotelDetail.length===0 && !loading"
       style="width:100%;text-align:center;height:150px;line-height:150px"
