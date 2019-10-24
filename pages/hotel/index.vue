@@ -476,6 +476,7 @@ export default {
   methods: {
     handleClickSpan(item) {
       this.loading = true;
+
       this.$axios({
         url: `/hotels/?city=${this.cityId}&_limit=${this.pageSize}&_start=${this.start}&scenic=${item.id}`
       }).then(res => {
@@ -486,6 +487,12 @@ export default {
         this.hotelDetail = data;
         this.total = total;
       });
+      setTimeout(() => {
+        if (!this.hotelDetail.length) {
+          this.map("noShow");
+        }
+        this.map();
+      }, 200);
     },
 
     //改变价格
@@ -555,19 +562,34 @@ export default {
     },
     // 获取全部酒店列表数据
     async getHotelDetail(obj, str) {
-      const hotel = await this.$axios({
-        url: `/hotels/?_limit=${this.pageSize}&_start=${this.start}${str}`,
-        params: obj
-      });
-      const { data, total } = hotel.data;
-      this.hotelDetail = data;
-      this.total = total;
-      setTimeout(() => {
-        this.loading = false;
-      }, 1000);
+      if (str) {
+        const hotel = await this.$axios({
+          url: `/hotels/?_limit=${this.pageSize}&_start=${this.start}${str}`,
+          params: obj
+        });
+        const { data, total } = hotel.data;
+        this.hotelDetail = data;
+        this.total = total;
+        setTimeout(() => {
+          this.loading = false;
+        }, 1000);
+      } else {
+        const hotel = await this.$axios({
+          url: `/hotels/?_limit=${this.pageSize}&_start=${this.start}`,
+          params: obj
+        });
+        const { data, total } = hotel.data;
+        this.hotelDetail = data;
+        this.total = total;
+        setTimeout(() => {
+          this.loading = false;
+        }, 1000);
+      }
     },
     // 切换评论条数
     handleSizeChange(val) {
+      this.pageIndex=1;
+      console.log(this.pageIndex)
       this.start = 0;
       this.pageSize = val;
       if (this.time.length !== 0) {
@@ -591,9 +613,9 @@ export default {
       if (val === 1) {
         this.start = 0;
       } else if (val === 2) {
-        this.start = 3;
+        this.start = this.pageSize;
       } else {
-        this.start = (val - 1) * 3;
+        this.start = (val - 1) * this.pageSize;
       }
       if (this.time.length !== 0) {
         this.handleLookPrice();
@@ -608,6 +630,7 @@ export default {
         this.getHotelDetail({}, this.str);
         return;
       }
+      // console.log(val,this.start)
       this.getHotelDetail();
       this.map();
     },
