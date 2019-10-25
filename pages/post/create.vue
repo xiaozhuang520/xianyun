@@ -48,8 +48,9 @@ export default {
   },
   methods: {
     //编辑草稿
-    handleEditDraft(data, index) {
-      this.index = index;
+    handleEditDraft(data) {
+      var quill = this.$refs.vueEditor.editor;
+      quill.root.innerHTML="";
       this.form.title = data.title;
       this.form.city = data.city;
       var quill = this.$refs.vueEditor.editor;
@@ -59,29 +60,18 @@ export default {
     handleSave() {
       var postTime = new Date();
       var newPostTime = moment(postTime).format("YYYY-MM-DD HH:mm:ss");
-      if (!this.index) {
         this.form.postTime = newPostTime;
       var quill = this.$refs.vueEditor.editor;
       this.form.content = quill.root.innerHTML;
       this.$store.commit("postdraft/setpostDraft", this.form);
       this.$message.success("保存成功");
-      this.index = null;
-      }else{
-        this.form.index = this.index;
-        this.form.postTime = newPostTime;
-        var quill = this.$refs.vueEditor.editor;
-        this.form.content = quill.root.innerHTML;
-        this.$store.commit("postdraft/editPostDraft", this.form);
-        this.$message.success("编辑成功");
-        this.index = null;
-      }
-       
+    
     },
     // 发布攻略
     handlePost() {
       var quill = this.$refs.vueEditor.editor;
       this.form.content = quill.root.innerHTML;
-      const { postTime,index, ...props } = this.form;
+      const { postTime,...props } = this.form;
       this.$axios({
         url: "/posts",
         headers: {

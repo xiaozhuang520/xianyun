@@ -3,7 +3,7 @@
     <h4>草稿箱({{postDraft.length}})</h4>
     <div class="draft" v-for="(item,index) in postDraft" :key="index">
       <el-row type="flex" justify="space-between">
-        <div class="title" @click="handleEditDraft(item,index)">
+        <div class="title" @click="handleEditDraft(item)">
           {{item.title}}
           <i class="iconfont icon44"></i>
         </div>
@@ -28,8 +28,8 @@ export default {
     }, 20);
   },
   methods: {
-    handleEditDraft(item,index) {
-      this.$emit("handleeditdraft", item,index);
+    handleEditDraft(item) {
+        this.$emit("handleeditdraft", item);
     },
     // 删除草稿
     handleDelete(index) {
