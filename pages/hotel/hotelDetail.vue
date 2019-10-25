@@ -3,7 +3,7 @@
     <el-breadcrumb separator="/">
       <el-breadcrumb-item :to="{ path: '/hotel' }">酒店</el-breadcrumb-item>
       <el-breadcrumb-item>
-        <a href="/hotel">南京酒店</a>
+        <a href="/hotel">{{hotelDetail.name}}</a>
       </el-breadcrumb-item>
       <el-breadcrumb-item>好来阁商务宾馆</el-breadcrumb-item>
     </el-breadcrumb>
