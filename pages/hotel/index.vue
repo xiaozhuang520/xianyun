@@ -630,7 +630,7 @@ export default {
       } else {
         this.start = (val - 1) * this.pageSize;
       }
-      if (this.time.length !== 0) {
+      if (this.time.length !== 0 || this.city!=="南京") {
         this.handleLookPrice();
         return;
       }
@@ -643,7 +643,6 @@ export default {
         this.getHotelDetail({}, this.str);
         return;
       }
-      // console.log(val,this.start)
       this.getHotelDetail();
       this.map();
     },
