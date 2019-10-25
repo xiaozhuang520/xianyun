@@ -1,10 +1,11 @@
 <template>
   <div>
-    <div class="detail" v-if="data.images.length>=1 && data.images.length<3">
+    <div class="detail" v-if="data.images.length<3">
       <el-row type="flex" justify="space-between">
         <div class="detail_img">
           <router-link :to="`post/detail?id=${data.id}`">
-            <img :src="item" alt v-for="(item,index) in data.images" :key="index" />
+            <img :src="item" alt v-for="(item,index) in data.images" :key="index" v-show="data.images>0"/>
+            <img src="../../assets/images/Cg.jpg" alt="" v-if="data.images==0">
           </router-link>
         </div>
         <div class="scenic_detail">

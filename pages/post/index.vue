@@ -61,11 +61,11 @@
         </div>
 
         <!-- 景点详情 -->
-        <postItem :data="item" v-for="(item,index) in postList" :key="index" />
+        <postItem :data="item" v-for="(item,index) in postList" :key="index"/>
         <div
           class="box"
           style="width:100%;text-align:center;height:200px;line-height:200px;"
-          v-if="postList.length==0"
+          v-if="postList.length===0"
         >暂无改城市的攻略</div>
         <!-- 分页 -->
         <el-pagination
@@ -130,23 +130,30 @@ export default {
   },
   methods: {
     getPostCity(data) {
-      if (data) {
-        this.$axios({
-          url: `/posts?_start=${this.start}&_limit=${this.pageSize}${data}`
-        }).then(res => {
-          const { data, total } = res.data;
-          this.total = total;
-          this.postList = data;
-        });
-      } else {
-        this.$axios({
-          url: `/posts?_start=${this.start}&_limit=${this.pageSize}`
-        }).then(res => {
-          const { data, total } = res.data;
-          this.total = total;
-          this.postList = data;
-        });
+
+      const config = {
+        _start: this.start,
+        _limit: this.pageSize
       }
+      
+      let query = Object.keys(config).map(v => {
+        return `${v}=${config[v]}`
+      })
+      let queryString = query.join("&");
+
+      if(data){
+        queryString = queryString += data;
+      }
+
+      this.$axios({
+        url: `/posts?${queryString}`,
+        // params: config
+      }).then(res => {
+        const { data, total } = res.data;
+        this.total = total;
+        this.postList = data;
+      });
+    
     },
     // 导航菜单显示与隐藏
     enter(item, index) {
@@ -177,12 +184,13 @@ export default {
       this.getPostCity();
     },
     handleCurrentChange(val) {
+       
       if (val === 1) {
         this.start = 0;
       } else if (val === 2) {
-        this.start = 3;
+        this.start = this.pageSize;
       } else {
-        this.start = (val - 1) * 3;
+        this.start = (val - 1) * this.pageSize;
       }
       this.getPostCity();
     },
