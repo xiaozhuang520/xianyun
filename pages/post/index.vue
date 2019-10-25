@@ -192,6 +192,10 @@ export default {
       } else {
         this.start = (val - 1) * this.pageSize;
       }
+      if(this.city){
+        this.getPostCity(`&city=${this.city}`)
+        return;
+      }
       this.getPostCity();
     },
     //点击推荐下的城市搜索城市
