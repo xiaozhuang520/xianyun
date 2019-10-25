@@ -97,7 +97,7 @@ export default {
           var quill = this.$refs.vueEditor.editor;
           quill.root.innerHTML = "";
           setTimeout(() => {
-            location.reload();
+            this.$router.push('/post')
           }, 500);
         }
       });
