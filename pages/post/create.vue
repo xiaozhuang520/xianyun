@@ -48,7 +48,8 @@ export default {
   },
   methods: {
     //编辑草稿
-    handleEditDraft(data) {
+    handleEditDraft(data, index) {
+      this.index = index;
       this.form.title = data.title;
       this.form.city = data.city;
       var quill = this.$refs.vueEditor.editor;
@@ -58,21 +59,29 @@ export default {
     handleSave() {
       var postTime = new Date();
       var newPostTime = moment(postTime).format("YYYY-MM-DD HH:mm:ss");
-      this.form.postTime = newPostTime;
+      if (!this.index) {
+        this.form.postTime = newPostTime;
       var quill = this.$refs.vueEditor.editor;
       this.form.content = quill.root.innerHTML;
-      if (!this.form.title) {
-        this.$message.success("请输入你要保存的内容");
-        return;
-      }
       this.$store.commit("postdraft/setpostDraft", this.form);
       this.$message.success("保存成功");
+      this.index = null;
+      }else{
+        this.form.index = this.index;
+        this.form.postTime = newPostTime;
+        var quill = this.$refs.vueEditor.editor;
+        this.form.content = quill.root.innerHTML;
+        this.$store.commit("postdraft/editPostDraft", this.form);
+        this.$message.success("编辑成功");
+        this.index = null;
+      }
+       
     },
     // 发布攻略
     handlePost() {
       var quill = this.$refs.vueEditor.editor;
       this.form.content = quill.root.innerHTML;
-      const { postTime, ...props } = this.form;
+      const { postTime,index, ...props } = this.form;
       this.$axios({
         url: "/posts",
         headers: {
@@ -87,6 +96,9 @@ export default {
           this.form = {};
           var quill = this.$refs.vueEditor.editor;
           quill.root.innerHTML = "";
+          setTimeout(() => {
+            location.reload();
+          }, 500);
         }
       });
     },
@@ -123,6 +135,7 @@ export default {
   },
   data() {
     return {
+      index:null,
       Cities: [],
       form: {
         title: "",

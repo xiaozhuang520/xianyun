@@ -11,5 +11,8 @@ export const mutations = {
     },
     deletePostDraft(state,index){
         state.postDraft.splice(index,1)
+    },
+    editPostDraft(state,data){
+        state.postDraft.splice(data.index,1,data)
     }
 }

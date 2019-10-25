@@ -144,8 +144,19 @@ export default {
         pics: []
       },
       isShow: false,
-      replyData: ""
+      replyData: null
     };
+  },
+  watch:{
+    $route(){
+        this.form.content = "";
+        this.form.follow="";
+        this.form.pics = [];
+        this.isShow = false;
+        this.start = 0;
+        this.replyData="";
+        this.$refs.upload.clearFiles();
+    }
   },
   methods: {
     //点击子项回复按钮
@@ -174,15 +185,18 @@ export default {
         this.$message.success(message);
         this.form.content = "";
         this.form.pics = [];
+        this.form.follow="";
         this.isShow = false;
         this.start = 0;
+        this.replyData="";
+        this.$refs.upload.clearFiles();
         this.getpostComments();
       });
     },
     //移除回复按钮
     handleDelete() {
       this.isShow = false;
-      this.replyData = "";
+      this.replyData = null;
     },
     //点击回复按钮
     handleReply(data) {

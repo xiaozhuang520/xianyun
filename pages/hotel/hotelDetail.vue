@@ -150,7 +150,7 @@
             :stroke-width="3"
             type="circle"
             :show-text="false"
-            :percentage="hotelDetail.scores.environment *10===null?0:hotelDetail.scores.environment *10"
+            :percentage="hotelDetail.scores.environment===null?0:hotelDetail.scores.environment"
             color="#f7ba2a"
           ></el-progress>
           <p class="environment">
@@ -164,7 +164,7 @@
             :stroke-width="3"
             type="circle"
             :show-text="false"
-            :percentage="hotelDetail.scores.product *10===null?0:hotelDetail.scores.product *10"
+            :percentage="hotelDetail.scores.product===null?0:hotelDetail.scores.product"
             color="#f7ba2a"
           ></el-progress>
           <p class="environment">
@@ -178,7 +178,7 @@
             :stroke-width="3"
             type="circle"
             :show-text="false"
-            :percentage="hotelDetail.scores.service *10 ===null?0:hotelDetail.scores.service *10"
+            :percentage="hotelDetail.scores.service ===null?0:hotelDetail.scores.service"
             color="#f7ba2a"
           ></el-progress>
           <p class="environment">
@@ -279,10 +279,6 @@ export default {
         var marker1 = new AMap.Marker({
           position: new AMap.LngLat(arr[0][0], arr[0][1]),
           title: this.cachepois[0].name
-        });
-        marker1.setLabel({
-          offset: new AMap.Pixel(6, 6),
-          content: "1"
         });
 
         var marker2 = new AMap.Marker({

@@ -152,8 +152,12 @@
             </el-tooltip>
           </el-row>
         </div>
-        <div v-if="hotelDetail.length===0 && loading" v-loading="loading" style="width: 100% ;position:absolute;left:600px;">
-          <img src="../../assets/images/loading.gif" alt="">
+        <div
+          v-if="hotelDetail.length===0 && loading"
+          v-loading="loading"
+          style="width: 420px ;position:absolute;left:580px;"
+        >
+          <img src="../../assets/images/loading.gif" alt />
         </div>
         <div class="right">
           <!-- 地图的容器 -->
@@ -266,7 +270,7 @@
 
     <hodelItem :data="item" v-for="(item,index) in hotelDetail" :key="index" />
     <div style="width: 100%;text-align:center;" v-loading="loading" v-if="loading">
-      <img src="../../assets/images/loading.gif" alt="">
+      <img src="../../assets/images/loading.gif" alt />
     </div>
     <div
       v-if="hotelDetail.length===0 && !loading"
@@ -301,6 +305,7 @@ export default {
         hotelbrand: [],
         hotelasset: []
       },
+      mapData: [],
       str: "",
       grade: "",
       loading: true,
@@ -446,15 +451,11 @@ export default {
     }
   },
   async mounted() {
+    this.getadress();
+    console.log(this.mapData);
     //  获取城市id
-    const res = await this.$axios({
-      url: `/cities/?name=${this.city}`
-    });
 
-    this.cityId = res.data.data[0].id;
-
-    this.scenics = res.data.data[0].scenics;
-
+    this.getCityId();
     //酒店选项
     const options = await this.$axios({
       url: "/hotels/options"
@@ -478,6 +479,22 @@ export default {
     document.head.appendChild(jsapi);
   },
   methods: {
+    async getadress(){
+      const res = await this.$axios({
+      url:
+        `https://restapi.amap.com/v3/place/text?key=9fad745c3af37dc9cc04d131d82cc8ec&keywords=酒店&city=${this.city}&offset=10&page=1`
+    });
+    this.mapData = res.data.pois;
+    },
+    async getCityId() {
+      const res = await this.$axios({
+        url: `/cities/?name=${this.city}`
+      });
+
+      this.cityId = res.data.data[0].id;
+
+      this.scenics = res.data.data[0].scenics;
+    },
     handleClickSpan(item) {
       this.loading = true;
 
@@ -505,34 +522,26 @@ export default {
     },
     map(isShow) {
       // 地图对象
-      var arr = this.hotelDetail.map(v => {
-        return v.location;
+      var arr=this.mapData.map(v => {
+        return v.location.split(',')
       });
       var map = new AMap.Map("container", {
-        zoom: 4, //级别
-        viewMode: "3D" //使用3D视图
+        zoom: 12, //级别
+        viewMode: "3D", //使用3D视图
+        center:[arr[0][0],arr[0][1]]
       });
       if (arr.length == 0) return;
       if (isShow) return;
 
-      // 点标记
-      var marker1 = new AMap.Marker({
-        position: new AMap.LngLat(arr[0].longitude, arr[0].latitude),
-        title: this.hotelDetail[0].name
-      });
-      var marker2 = new AMap.Marker({
-        position: new AMap.LngLat(arr[1].longitude, arr[1].latitude),
-        title: this.hotelDetail[1].name
-      });
-      var marker3 = new AMap.Marker({
-        position: new AMap.LngLat(arr[2].longitude, arr[2].latitude),
-        title: this.hotelDetail[2].name
-      });
-      var markerList = [marker1, marker2, marker3];
-      if (!this.loading && this.hotelDetail.length == 0) {
-        markerList = [];
+      // // 点标记
+      for (var i = 0; i < this.mapData.length; i++) {
+        var marker = new AMap.Marker({
+          position: new AMap.LngLat( arr[i][0],arr[i][1]),
+          title: this.mapData[i].name
+        });
+         map.add([marker]); //添加到地图
       }
-      map.add(markerList); //添加到地图
+     
     },
     //查看价格
     async handleLookPrice() {
@@ -609,6 +618,7 @@ export default {
         return;
       }
       this.getHotelDetail();
+      
       this.map();
     },
     // 切换评论到第几条
@@ -674,11 +684,31 @@ export default {
     // 城市下拉选择时触发
     handleDepartSelect(item) {
       this.city = item.value;
+      this.getCityId();
+      setTimeout(() => {
+        this.handleLookPrice();
+      }, 200);
+      setTimeout(() => {
+        if (!this.hotelDetail.length) {
+          this.map("noShow");
+        }
+        this.map();
+      }, 100);
     },
     //失去焦点是默认选择第一个
     handleSelectCity(type) {
       if (this.Cities.length === 0) return false;
       this.city = this.Cities[0].value;
+      this.getCityId();
+      setTimeout(() => {
+        this.handleLookPrice();
+      }, 200);
+      setTimeout(() => {
+        if (!this.hotelDetail.length) {
+          this.map("noShow");
+        }
+        this.map();
+      }, 100);
     }
   },
   components: {
