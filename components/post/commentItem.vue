@@ -3,7 +3,8 @@
     <router-link :to="`/post/detail?id=${data.id}`">
       <el-row type="flex" justify="space-between">
         <div class="left_img">
-          <img :src="data.images[0]" alt />
+          <img :src="data.images[0]" alt v-if="data.images.length>0"/>
+          <img src="../../assets/images/Cg.jpg" alt v-if="data.images.length===0"/>
         </div>
         <div class="right_content">
           <div class="title">
